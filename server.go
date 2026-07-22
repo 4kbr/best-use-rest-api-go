@@ -1,70 +1,44 @@
-// WAJIB: Setiap file Go punya package.
-// "main" adalah package spesial — dia jadi entry point program.
-// Kalau package-nya bukan "main", dia jadi library yang bisa di-import.
+// package main adalah package spesial yang menghasilkan binary executable.
+// Setiap program Go yang bisa dijalankan harus punya func main() di package main.
 package main
 
-// import: cara ambil package bawaan Go atau punya orang lain.
-// - fmt: buat format teks (print ke console, tulis ke response, dll)
-// - log: buat logging (catat error/info)
-// - net/http: segalanya tentang web (server, request, response)
+// import digunakan untuk mengambil package lain.
+// fmt: format teks (print ke console atau response).
+// net/http: package untuk web server, request, response.
 import (
 	"fmt"
-	"log"
 	"net/http"
 )
 
-// func main() = fungsi pertama yang jalan saat program dijalankan.
-// Ini CERITA UTAMA program kita. Semua dimulai dari sini.
+// func main adalah entry point. Semua program mulai dari sini.
 func main() {
-	// http.HandleFunc: "Hei Go, kalau ada yang request ke path "/",
-	// jalankan fungsi ini."
-	//
-	// w http.ResponseWriter = tempat kita nulis jawaban.
-	// ibaratnya kita punya kertas kosong, kita tulis "hello from server!"
-	// lalu Go kirimkan kertas itu ke client (browser, curl, dll).
-	//
-	// r *http.Request = isi surat dari client.
-	// Di sini ada method (GET/POST), URL, header, body, dll.
-	// Nanti kita bakal sering lihat "r" ini.
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-
-		// fmt.Fprintln: cetak teks ke "writer" (w).
-		// F println = File + Print Line.
-		// w adalah ResponseWriter — jadi teks ini masuk ke response.
-		fmt.Fprintln(w, "hello from server!")
+	// http.HandleFunc mendaftarkan handler untuk suatu path.
+	// Setiap kali ada request ke "/orders", fungsi ini akan dijalankan.
+	// w = tempat menulis response, r = data request dari client.
+	http.HandleFunc("/orders", func(w http.ResponseWriter, r *http.Request) {
+		// fmt.Fprintf menulis teks yang diformat ke ResponseWriter.
+		// Teks ini akan dikirim sebagai response ke client.
+		fmt.Fprintf(w, "handling incoming orders")
 	})
 
-	// const: bikin nilai tetap yang nggak bisa berubah.
-	// port: nama variable-nya (lowercase karena cuma dipakai di sini).
-	// string: tipe data-nya (kata/kalimat).
-	// ":8080": nilai-nya. Artinya server dengerin di port 8080.
-	// Kenapa ada ":" di depan? Itu aturan Go: port harus diawali ":".
-	const port string = ":8080"
+	// http.HandleFunc mendaftarkan handler ke path "/users".
+	// Pola yang sama seperti "/orders", beda path dan response.
+	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+		// fmt.Fprintf menuliskan response string ke client.
+		fmt.Fprintf(w, "handling incoming users")
+	})
 
-	// Alternatif: pake := (deklarasi + assign otomatis).
-	// Go tebak tipe data dari nilai di kanan.
-	// Baris ini sengaja di-comment (tidak aktif).
-	// port := ":8080"
+	// deklarasi variable port dengan tipe yang di-infer oleh Go.
+	// ":=" adalah short variable declaration (deklarasi + assignment).
+	port := 3000
 
-	// fmt.Println: cetak teks ke terminal (STDOUT).
-	// Berguna buat ngasih tau status ke developer yang menjalankan server.
-	fmt.Println("server listening on port:", port)
+	// fmt.Println mencetak log ke terminal untuk memberi tahu developer.
+	fmt.Println("server is running on port:", port)
 
-	// http.ListenAndServe: "Hidupkan server dan dengerin request!"
-	// Parameter 1: port (":8080")
-	// Parameter 2: handler (nil = pake default, yaitu HandleFunc di atas)
-	//
-	// Fungsi ini NGELOCK program — server jalan terus sampai dimatiin.
-	// err := ... karena ListenAndServe MENGEMBALIKAN error kalau gagal.
-	err := http.ListenAndServe(port, nil)
+	// http.ListenAndServe menghidupkan HTTP server.
+	// Parameter 1: alamat "host:port" (":3000").
+	// Parameter 2: handler (nil = pakai DefaultServeMux).
+	// Fungsi ini blocking — server jalan terus sampai dimatikan.
+	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 
-	// if err != nil = cek apakah ada error.
-	// nil = kosong/tidak ada. Kalau err bukan nil, artinya ada masalah.
-	// Ini WAJIB dilakukan di Go — kalau ada error, kita harus tangani.
-	if err != nil {
-		// log.Fatalln: cetak error ke terminal, lalu matikan program.
-		// Fatal = berhenti total. Ini cuma dipakai di func main.
-		// Di fungsi lain, kita return error, jangan pake Fatal.
-		log.Fatalln("error when starting server", err)
-	}
 }
