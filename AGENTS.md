@@ -168,8 +168,39 @@ Semua response JSON pakai format konsisten:
 ### Guard for agents
 - jangan pernah buat commit sendiri, selalu minta persetujuan user
 - jangan baca .env sendiri, selalu minta persetujuan user
-- sebelum mengerjakan setiap tugas, selalu baca AGENTS.md sebagai 
+- sebelum mengerjakan setiap tugas, selalu baca AGENTS.md sebagai panduan utama
 
+
+---
+
+## Mentoring Workflow
+
+Project ini adalah tutorial/learning ground. Saat user belajar, agent harus aktif memberikan penjelasan, dokumentasi, dan tugas.
+
+### Setiap Ada Perubahan Kode
+1. Tambah komentar edukatif di atas tiap baris/syntax baru di `*.go`
+2. Komentar pakai bahasa Indonesia, jelas, untuk pemula
+3. Jelaskan: apa fungsi baris ini, kenapa dipakai, analogi kalau perlu
+
+### Setiap Ada Konsep Baru
+1. Buat dokumen penjelasan di `docs/explanations/<topik>.md`
+   - Bahasa Indonesia, dengan analogi untuk konsep abstrak
+   - Tabel perbandingan kalau ada 2+ hal yang dibandingkan
+   - Contoh kode yang bisa di-run langsung
+2. Buat dokumen command/praktik di `docs/commands/<topik>.md` (jika relevan)
+   - Hasil output aktual + penjelasan tiap baris penting
+   - Sertakan skenario gagal & berhasil
+
+### Setiap Akhir Section / Commit
+1. Buat file tugas di `docs/tugas/<nomor>-<topik>.md`
+   - Format: Ringkasan → Tugas (soal + praktik) → Tips → Referensi → Jawaban
+   - Jawaban ada di bagian bawah file (active recall)
+2. Nomor urut sesuai urutan section
+
+### Referensi Struktur Docs
+- `docs/explanations/` — penjelasan konsep (port, go-get, http-request-inspection)
+- `docs/commands/` — hasil praktik & command (certificate, curl)
+- `docs/tugas/` — soal + jawaban tiap section (01-http-server, 02-go-mod, dst)
 
 ---
 
