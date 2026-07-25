@@ -35,3 +35,8 @@ Thumbs.db
 
 # Dependency
 vendor/
+
+# Certificate (development self-signed)
+# cert.pem boleh di-commit, key.pem JANGAN pernah di-commit.
+# Lebih aman ignore semua *.pem dan generate ulang.
+*.pem
