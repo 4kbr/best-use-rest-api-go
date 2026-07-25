@@ -26,6 +26,12 @@ func main() {
 	// Setiap kali ada request ke "/orders", fungsi ini akan dijalankan.
 	// w = tempat menulis response, r = data request dari client.
 	http.HandleFunc("/orders", func(w http.ResponseWriter, r *http.Request) {
+
+		// logRequestDetails: cetak HTTP version & TLS version ke terminal.
+		// Berguna pas debugging — tahu client pake HTTP/1.1 atau HTTP/2,
+		// dan apakah koneksi pakai TLS atau tidak.
+		logRequestDetails(r)
+
 		// fmt.Fprintf menulis teks yang diformat ke ResponseWriter.
 		// Teks ini akan dikirim sebagai response ke client.
 		fmt.Fprintf(w, "handling incoming orders")
@@ -34,6 +40,12 @@ func main() {
 	// http.HandleFunc mendaftarkan handler ke path "/users".
 	// Pola yang sama seperti "/orders", beda path dan response.
 	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+
+		// logRequestDetails: cetak HTTP version & TLS version ke terminal.
+		// Berguna pas debugging — tahu client pake HTTP/1.1 atau HTTP/2,
+		// dan apakah koneksi pakai TLS atau tidak.
+		logRequestDetails(r)
+
 		// fmt.Fprintf menuliskan response string ke client.
 		fmt.Fprintf(w, "handling incoming users")
 	})
@@ -91,4 +103,44 @@ func main() {
 	//	if err != nil {
 	//		log.Fatalln("could not start server")
 	//	}
+}
+
+// logRequestDetails: mencetak informasi HTTP request ke terminal.
+// r.Proto = HTTP version dari request ("HTTP/1.1", "HTTP/2", dll).
+// r.TLS   = nil kalau koneksi HTTP biasa, berisi struct TLS kalau HTTPS.
+// Fungsi ini dipanggil di setiap handler buat debugging.
+func logRequestDetails(r *http.Request) {
+	// r.Proto: string yang berisi HTTP version.
+	// Contoh: "HTTP/1.1", "HTTP/2", "HTTP/3".
+	httpVersion := r.Proto
+	fmt.Println("received request with HTTP version:", httpVersion)
+
+	// r.TLS: kalau nil → koneksi HTTP biasa (tanpa enkripsi).
+	// Kalau tidak nil → koneksi HTTPS (TLS aktif).
+	// r.TLS.Version: uint16 yang menandakan versi TLS.
+	if r.TLS != nil {
+		tlsVersion := getTLSVersionName(r.TLS.Version)
+		fmt.Println("received request with TLS version:", tlsVersion)
+	} else {
+		fmt.Println("received request without TLS")
+	}
+}
+
+// getTLSVersionName: konversi angka versi TLS ke string yang mudah dibaca.
+// tls.VersionTLSxx adalah constant dari package crypto/tls.
+// Parameter: version uint16 dari r.TLS.Version.
+// Return: string seperti "TLS 1.2", "TLS 1.3", dll.
+func getTLSVersionName(version uint16) string {
+	switch version {
+	case tls.VersionTLS10:
+		return "TLS 1.0"
+	case tls.VersionTLS11:
+		return "TLS 1.1"
+	case tls.VersionTLS12:
+		return "TLS 1.2"
+	case tls.VersionTLS13:
+		return "TLS 1.3"
+	default:
+		return fmt.Sprintf("default: versi %d", version)
+	}
 }
